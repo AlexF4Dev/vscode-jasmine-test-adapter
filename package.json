@@ -43,6 +43,7 @@
     "minimatch": "^3.0.4",
     "stack-trace": "0.0.10",
     "tslib": "^1.10.0",
+    "path": "^0.12.7",
     "vscode-test-adapter-api": "^1.7.0",
     "vscode-test-adapter-util": "^0.7.0"
   },
@@ -151,7 +152,16 @@
           "description": "write diagnostic logs to the given file",
           "type": "string",
           "scope": "resource"
+        },
+        "jasmineExplorer.overrideFunctionFiles": {
+          "description": "file name of the files which have function overrides for describe, fdescribe, xdescribe",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "scope": "resource"
         }
+
       }
     }
   }

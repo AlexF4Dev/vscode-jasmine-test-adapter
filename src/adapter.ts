@@ -136,7 +136,7 @@ export class JasmineAdapter implements TestAdapter, IDisposable {
 		const suites: { [id: string]: TestSuiteInfo } = {};
 
 		await new Promise<JasmineTestSuiteInfo | undefined>(resolve => {
-			const args = [config.jasminePath, config.configFilePath, JSON.stringify(this.log.enabled)];
+			const args = [config.jasminePath, config.configFilePath, JSON.stringify(this.log.enabled), JSON.stringify(config.overrideFunctionFiles)];
 			const childProcess = fork(
 				require.resolve('./worker/loadTests.js'),
 				args,
@@ -145,7 +145,7 @@ export class JasmineAdapter implements TestAdapter, IDisposable {
 					env: config.env,
 					execPath: config.nodePath,
 					execArgv: config.nodeArgv,
-					stdio: ['pipe', 'pipe', 'pipe', 'ipc']
+					stdio: ['pipe', 'pipe', 'pipe', 'ipc'],
 				}
 			);
 
@@ -433,7 +433,9 @@ export class JasmineAdapter implements TestAdapter, IDisposable {
 
 		const debuggerSkipFiles = adapterConfig.get<string[]>('debuggerSkipFiles') || [];
 
-		return { cwd, configFilePath, specDir, testFileGlobs, env, nodePath, nodeArgv, jasminePath, debuggerPort, debuggerConfig, breakOnFirstLine, debuggerSkipFiles };
+		const overrideFunctionFiles = adapterConfig.get<string[]>('overrideFunctionFiles') || ["describe-api"];
+
+		return { cwd, configFilePath, specDir, testFileGlobs, env, nodePath, nodeArgv, jasminePath, debuggerPort, debuggerConfig, breakOnFirstLine, debuggerSkipFiles, overrideFunctionFiles};
 	}
 
 	private collectNodesById(info: TestSuiteInfo | TestInfo): void {
@@ -517,6 +519,7 @@ interface LoadedConfig {
 	debuggerConfig: string | undefined;
 	breakOnFirstLine: boolean;
 	debuggerSkipFiles: string[];
+	overrideFunctionFiles: string[];
 }
 
 interface JasmineTestSuiteInfo extends TestSuiteInfo {

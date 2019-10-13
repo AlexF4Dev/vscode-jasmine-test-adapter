@@ -5,16 +5,18 @@ import { patchJasmine } from './patchJasmine';
 const sendMessage = process.send ? (message: any) => process.send!(message) : () => {};
 
 let logEnabled = false;
+let overrideFunctionFiles = [];
 try {
 
 	const jasminePath = process.argv[2];
 	const configFile = process.argv[3];
 	logEnabled = <boolean>JSON.parse(process.argv[4]);
+	overrideFunctionFiles =  <string[]>JSON.parse(process.argv[5]);
 
 	const Jasmine = require(jasminePath);
 	const jasmine = new Jasmine({});
 	if (logEnabled) sendMessage('Patching Jasmine');
-	const locations = patchJasmine(jasmine);
+	const locations = patchJasmine(jasmine, overrideFunctionFiles);
 	if (logEnabled) sendMessage('Loading config file');
 	jasmine.loadConfigFile(configFile);
 

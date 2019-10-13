@@ -1,4 +1,5 @@
 import Jasmine = require('jasmine');
+let path = require('path');
 import { parse as parseStackTrace } from 'stack-trace';
 
 export interface Location {
@@ -6,7 +7,8 @@ export interface Location {
 	line: number
 }
 
-export function patchJasmine(jasmine: Jasmine): Map<string, Location> {
+export function patchJasmine(jasmine: Jasmine, overrideFunctionFiles: string[]): Map<string, Location> {
+
 
 	const locations = new Map<string, Location>();
 	const env: any = jasmine.env;
@@ -15,11 +17,11 @@ export function patchJasmine(jasmine: Jasmine): Map<string, Location> {
 	for (const functionName of ['describe', 'fdescribe', 'xdescribe', 'it', 'fit', 'xit']) {
 
 		const origImpl = env[functionName];
-		env[functionName] = function() {
+		env[functionName] = function () {
 
 			const result = origImpl.apply(this, arguments);
 
-			const location = findCallLocation(functionName);
+			const location = findCallLocation(functionName, overrideFunctionFiles);
 			if (location) {
 				locations.set(result.id, location);
 			}
@@ -31,13 +33,20 @@ export function patchJasmine(jasmine: Jasmine): Map<string, Location> {
 	return locations;
 }
 
-function findCallLocation(functionName: string): Location | undefined {
+function getFilenameWithoutExtension(fileName: any) : string {
+    return path.parse(fileName).name;
+}
+
+function findCallLocation(functionName: string, overrideFunctionFiles: string[]): Location | undefined {
 
 	const stackTrace = parseStackTrace(new Error());
-
 	for (var i = 0; i < stackTrace.length - 1; i++) {
 		if (stackTrace[i].getFunctionName() === functionName) {
-			const callSite = stackTrace[i + 1];
+			let callSite = stackTrace[i + 1];
+			if (overrideFunctionFiles.find( (x) => x === getFilenameWithoutExtension(callSite.getFileName()))) {
+				callSite = stackTrace[i + 2];
+			}
+
 			return {
 				file: callSite.getFileName(),
 				line: callSite.getLineNumber() - 1

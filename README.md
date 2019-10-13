@@ -64,6 +64,7 @@ Property                            | Description
 `testExplorer.gutterDecoration`     | Show the state of each test in the editor using Gutter Decorations
 `testExplorer.onStart`              | Retire or reset all test states whenever a test run is started
 `testExplorer.onReload`             | Retire or reset all test states whenever the test tree is reloaded
+`testExplorer.overrideFunctionFiles`  file name of the files which have function overrides for describe, fdescribe, xdescribe
 
 ## Commands
 
