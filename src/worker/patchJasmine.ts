@@ -43,8 +43,11 @@ function findCallLocation(functionName: string, overrideFunctionFiles: string[])
 	for (var i = 0; i < stackTrace.length - 1; i++) {
 		if (stackTrace[i].getFunctionName() === functionName) {
 			let callSite = stackTrace[i + 1];
+			
 			if (overrideFunctionFiles.find( (x) => x === getFilenameWithoutExtension(callSite.getFileName()))) {
+				console.log(`Override stack position for the file: ${getFilenameWithoutExtension(callSite.getFileName())}`);
 				callSite = stackTrace[i + 2];
+				console.log(stackTrace[i + 2].getFileName());
 			}
 
 			return {
